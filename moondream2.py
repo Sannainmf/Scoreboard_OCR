@@ -24,8 +24,7 @@ def visualize_regions(frame, regions, output_path):
         cv2.rectangle(vis_frame, (x, y), (x+w, y+h), color, 2)
         cv2.putText(vis_frame, label.upper(), (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
     cv2.imwrite(str(output_path), vis_frame)
-
-# ----------------- Moondream2 OCR ----------------- 
+ 
 # Load Moondream2 once
 model = AutoModelForCausalLM.from_pretrained(
     "vikhyatk/moondream2", 
@@ -52,7 +51,7 @@ def ocr_with_moondream(cropped_frame):
         print("Moondream2 query failed:", e)
     return None
 
-# ----------------- Score Coordinates ----------------- 
+#Score regions
 HOME_X1, HOME_Y1, HOME_X2, HOME_Y2 = 925, 221, 975, 268
 AWAY_X1, AWAY_Y1, AWAY_X2, AWAY_Y2 = 1050, 210, 1090, 250
 SCORE_REGIONS = {
@@ -63,13 +62,9 @@ SCORE_REGIONS = {
 SCALE_FACTOR = 4
 INTERVAL_SECONDS = 1
 
-# ----------------- Video Loading ----------------- 
 videos_dir = Path('videos')
 video_files = (
-    list(videos_dir.glob('*.mp4')) + 
-    list(videos_dir.glob('*.avi')) + 
-    list(videos_dir.glob('*.mov')) + 
-    list(videos_dir.glob('*.mkv'))
+    list(videos_dir.glob('*.mp4'))
 )
 
 if not video_files:
@@ -94,7 +89,7 @@ print(f"FPS: {fps:.1f}, Total frames: {total_frames}")
 print(f"Extracting 1 frame every {INTERVAL_SECONDS}s ({frame_interval} frames)")
 print(f"Estimated frames to process: {total_frames // frame_interval}\n")
 
-# ----------------- STEP 1: Extract frames ----------------- 
+#Extract frames
 print("Step 1: Extracting frames...")
 frames_data = []
 frame_count = 0
@@ -117,7 +112,7 @@ while True:
 cap.release()
 print(f"Extracted {len(frames_data)} frames\n")
 
-# ----------------- STEP 2: Process frames with Moondream2 ----------------- 
+#Process frames with moondream2
 print("Step 2: Running OCR on all frames...")
 
 with open(csv_filename, 'w', newline='') as f:

@@ -11,10 +11,7 @@ from PIL import Image
 # IDEFICS2 imports
 from transformers import AutoProcessor, AutoModelForVision2Seq
 
-
-# -------------------------
-#   SIMPLE ZOOM CROP
-# -------------------------
+#Simple zoom crop function
 def simple_zoom_crop(frame, crop_x, crop_y, crop_width, crop_height, scale_factor=4):
     cropped = frame[crop_y:crop_y+crop_height, crop_x:crop_x+crop_width]
     new_width = crop_width * scale_factor
@@ -22,10 +19,7 @@ def simple_zoom_crop(frame, crop_x, crop_y, crop_width, crop_height, scale_facto
     zoomed = cv2.resize(cropped, (new_width, new_height), interpolation=cv2.INTER_LANCZOS4)
     return zoomed
 
-
-# -------------------------
-#   VISUALIZATION
-# -------------------------
+#visualization
 def visualize_regions(frame, regions, output_path):
     vis_frame = frame.copy()
     for label, coords in regions.items():
@@ -35,10 +29,7 @@ def visualize_regions(frame, regions, output_path):
         cv2.putText(vis_frame, label.upper(), (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
     cv2.imwrite(str(output_path), vis_frame)
 
-
-# -------------------------
-#   OCR FUNCTION (IDEFICS2)
-# ------------------------- 
+#OCR function with Idefics2
 def ocr_with_idefics2(cropped_frame, model, processor):
     """Use Idefics2 to read the score from cropped frame"""
 
@@ -83,9 +74,7 @@ def ocr_with_idefics2(cropped_frame, model, processor):
 
 
 
-# -------------------------
-#   SCORE REGIONS
-# -------------------------
+#score regions
 HOME_X1, HOME_Y1, HOME_X2, HOME_Y2 = 925, 221, 975, 268
 AWAY_X1, AWAY_Y1, AWAY_X2, AWAY_Y2 = 1050, 210, 1090, 250
 
@@ -98,15 +87,9 @@ SCALE_FACTOR = 4
 INTERVAL_SECONDS = 1
 
 
-# -------------------------
-#   VIDEO DISCOVERY
-# -------------------------
 videos_dir = Path('videos')
 video_files = (
-    list(videos_dir.glob('*.mp4')) +
-    list(videos_dir.glob('*.avi')) +
-    list(videos_dir.glob('*.mov')) +
-    list(videos_dir.glob('*.mkv'))
+    list(videos_dir.glob('*.mp4'))
 )
 
 if not video_files:
@@ -123,10 +106,7 @@ debug_dir.mkdir(exist_ok=True)
 
 csv_filename = results_dir / f"scores_idefics2_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
 
-
-# -------------------------
-#   STEP 1 — EXTRACT FRAMES
-# -------------------------
+#Extract frames
 cap = cv2.VideoCapture(str(video_path))
 fps = cap.get(cv2.CAP_PROP_FPS)
 total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -161,10 +141,7 @@ while True:
 cap.release()
 print(f"Extracted {len(frames_data)} frames\n")
 
-
-# -------------------------
-#   STEP 2 — LOAD IDEFICS2
-# -------------------------
+#Load Idefics2
 print("Step 2: Loading Idefics2 8B model...")
 
 processor = AutoProcessor.from_pretrained("HuggingFaceM4/idefics2-8b")
@@ -177,9 +154,7 @@ model = AutoModelForVision2Seq.from_pretrained(
 print("Model ready\n")
 
 
-# -------------------------
-#   STEP 3 — RUN OCR
-# -------------------------
+#Run OCR-
 print("Step 3: Running OCR on all frames...")
 
 # CSV header

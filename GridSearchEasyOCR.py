@@ -35,8 +35,7 @@ ADJUST_CONTRASTS = [0.5, 0.7, 0.9]
 
 # Get video
 videos_dir = Path('videos')
-video_files = list(videos_dir.glob('*.mp4')) + list(videos_dir.glob('*.avi')) + \
-              list(videos_dir.glob('*.mov')) + list(videos_dir.glob('*.mkv'))
+video_files = list(videos_dir.glob('*.mp4')) 
 
 if not video_files:
     print("No video found")
